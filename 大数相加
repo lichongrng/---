@@ -1,0 +1,94 @@
+import numpy as np
+class ExactSummator():
+    def __init__(self):
+        self.addsMap={}#１０以内的加法表
+        for i in xrange(10): 
+            for j in xrange(10):
+                self.addsMap[(str(i)+str(j))]=str(i+j)
+
+    def add(self,x1="999",x2="999"):
+        numList1=list(x1)
+        numList1.reverse()
+        numList2=list(x2)
+        numList2.reverse()
+
+        maxLen=0
+        minLen=0
+
+        len1=len(numList1)
+        len2=len(numList2)
+
+        if len1<len2:
+            maxLen=len2
+            minLen=len1
+        else:
+            maxLen=len1
+            minLen=len2
+
+        carryBit="0"#进位
+        results=[]
+        for i in xrange(minLen):
+
+            v1=numList1[i]
+            v2=numList2[i]
+
+            result=self.addsMap[str(v1)+str(v2)]
+
+            if len(result)==2:
+                result=self.addsMap[result[1:]+carryBit]
+                carryBit="1"
+            else:
+                result=self.addsMap[result+carryBit] 
+                carryBit="0"
+                if len(result)==2:
+                    result=result[1:]
+                    carryBit="1"
+
+            results.append(result)    
+
+            if i==minLen-1:
+                nums=None
+                if maxLen==len1:
+                    nums=numList1
+                else:
+                    nums=numList2
+
+
+                if carryBit=="0":
+                    for j in xrange(i+1,maxLen):
+                        results.append(nums[j])
+                else:#1
+                    if maxLen==minLen:
+                        results.append(carryBit) 
+
+                    for j in xrange(i+1,maxLen):
+                        result=self.addsMap[nums[j]+carryBit]
+
+                        if len(result)==2:
+                            result=result[1:]
+                            results.append(result) 
+                            carryBit="1"
+                            if j==maxLen-1:
+                                results.append(carryBit)
+                        else:
+                            carryBit="0"
+                            results.append(result) 
+
+        results.reverse()   
+        return "".join(results)         
+
+
+    def test(self):
+        es.add()
+        for i in xrange(100000):
+            x1=np.random.randint(0,10e15)
+            x2=np.random.randint(0,10e15)
+            result=es.add(str(x1),str(x2))
+            print x1,"+",x2,"=",result,":",x1+x2
+            assert int(result)==x1+x2
+        print "success!"
+
+
+if __name__=="__main__":
+    es=ExactSummator()
+    es.test()
